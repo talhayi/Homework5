@@ -36,13 +36,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun delete(){
+    private fun delete() {
         // İşlem boş değilse, son karakteri siler.
         if (workings.isNotEmpty()) {
             workings = workings.dropLast(1)
             binding.textViewWorkings.text = workings
         }
     }
+
     private fun appendText(text: String) {
         // Sonuç gösteriliyorsa, yeni bir işlem başlatır.
         if (isResultShown) {
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             binding.textViewWorkings.text = ""
             isResultShown = false
         }
-        // Virgül eklenmek isteniyorsa:
+        // Virgül eklenmek isteniyorsa
         if (text == ",") {
             // Eğer workings içinde virgül varsa, yeni bir virgül eklenmez.
             if (!workings.contains(",")) {
@@ -62,14 +63,23 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             // İşlem "0" ile başlıyorsa ve kullanıcı bir sayı ekliyorsa veya son karakter bir operatörse ve kullanıcı bir sayı ekliyorsa, sadece sayı eklenir.
-        } else if (workings == "0" && (text.matches(Regex("[0-9]")) ||
-                    text.matches(Regex("[-+×/]")))) {
+        } else if (workings == "0" && (text.matches(Regex("[0-9]")) || text.matches(Regex("[-+×/]")))) {
             workings = text
         } else {
-            // Son eklenen karakter bir operatörse ve workings'in son karakteri de bir operatörse, en son eklenen operatörü eklemeyiz.
-            if (text.matches(Regex("[-+×/]")) && workings.isNotEmpty() &&
-                workings.last().toString().matches(Regex("[-+×/]"))) {
+            if (text.matches(Regex("[-+×/]")) && workings.isNotEmpty() && workings.last().toString()
+                    .matches(Regex("[-+×/]"))
+            ) {
                 workings = workings.dropLast(1)
+            }
+            if (!text.matches(Regex("[-+×/]")) && binding.textViewResult.text != "0" && !workings.any { it in "+-×/" }) {
+                clear()
+            }
+
+            // Hata kontrolü: Sıfıra bölme
+            if (text == "/" && binding.textViewWorkings.text == "0") {
+                clear()
+                binding.textViewResult.text = "Error: Division by zero"
+                return
             }
             workings += text
         }
